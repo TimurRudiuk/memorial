@@ -1,17 +1,21 @@
-import { PrismaClient } from '@prisma/client'
-import { PrismaNeon } from '@prisma/adapter-neon'
 import { NextResponse } from 'next/server'
-
-const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! })
-const prisma = new PrismaClient({ adapter })
+import prisma from '@/lib/prisma'
 
 export async function GET() {
-  const memorials = await prisma.memorial.findMany()
-  return NextResponse.json(memorials)
+  try {
+    const memorials = await prisma.memorial.findMany()
+    return NextResponse.json(memorials)
+  } catch {
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
 }
 
 export async function POST(req: Request) {
-  const body = await req.json()
-  const memorial = await prisma.memorial.create({ data: body })
-  return NextResponse.json(memorial, { status: 201 })
+  try {
+    const body = await req.json()
+    const memorial = await prisma.memorial.create({ data: body })
+    return NextResponse.json(memorial, { status: 201 })
+  } catch {
+    return NextResponse.json({ error: 'Server error' }, { status: 500 })
+  }
 }
