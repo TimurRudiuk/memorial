@@ -20,6 +20,7 @@ export default function LoginPage() {
     if (res?.error) {
       setError('Невірний email або пароль')
     } else {
+      router.refresh()
       router.push('/memorials')
     }
   }
