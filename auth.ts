@@ -5,21 +5,32 @@ import GitHub from 'next-auth/providers/github'
 import prisma from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 
+
+
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
+
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/login',
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id
+        token.name = user.name
+      }
+      if (trigger === 'update' && session?.name !== undefined) {
+        token.name = session.name
       }
       return token
     },
     async session({ session, token }) {
       if (token?.id) {
         session.user.id = token.id as string
+      }
+      if (token?.name !== undefined) {
+        session.user.name = token.name as string
       }
       return session
     },
